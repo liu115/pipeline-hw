@@ -21,7 +21,9 @@ input [4:0]  RDaddr_i;
 output  RegWrite_o, MemtoReg_o;
 output [31:0] ReadData_o, ALUdata_o;
 output [4:0] RDaddr_o;
-reg RegWrite_o, MemtoReg_o, ReadData_o, ALUdata_o, RDaddr_o;
+reg  RegWrite_o, MemtoReg_o;
+reg [31:0] ReadData_o, ALUdata_o;
+reg [4:0] RDaddr_o;
 
 always @ ( posedge clk_i or negedge start_i) begin
   if (~start_i) begin
