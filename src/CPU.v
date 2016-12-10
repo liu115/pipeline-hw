@@ -33,6 +33,11 @@ Adder Add_PC(
     .data_o     (addpc_out)
 );
 
+Adder IAdd (
+    .data1_in (IDEX.addr_o), //TODO: not sure
+    .data2_in (IDEX.Signextend_o << 2), //same
+    .data_o ()
+);
 
 PC PC(
     .clk_i      (clk_i),
@@ -94,14 +99,14 @@ MUX5 MUX_RegDst(
 
 
 MUX32 MUX_ALUSrc(
-    .data1_i    (Registers.RTdata_o),
+    .data1_i    (IDEX.RTdata_o), //TODO: IDEX to wire
     .data2_i    (Sign_Extend.data_o),
-    .select_i   (Control.ALUSrc_o),
-    .data_o     (ALU.data2_i)
+    .select_i   (IDEX.ALUSrc_o),
+    .data_o     ()
 );
 
 
-
+// TODO: sign extend output need a wire to split up
 Sign_Extend Sign_Extend(
     .data_i     (inst[15:0]),
     .data_o     ()
@@ -113,8 +118,8 @@ ALU ALU(
     .data1_i    (Registers.RSdata_o),
     .data2_i    (MUX_ALUSrc.data_o),
     .ALUCtrl_i  (ALU_Control.ALUCtrl_o),
-    .data_o     (Registers.RDdata_i),
-    .Zero_o     (zero)
+    .data_o     (),
+    .Zero_o     ()
 );
 
 
@@ -142,11 +147,11 @@ EXMEM EXMEM (
     .Branch_i (IDEX.Branch_o),
     .MemRead_i (IDEX.MemRead_o),
     .MemWrite_i (IDEX.MemWrite_o),
-    .Adderdata_i (), // adder result
-    .ALUzero_i (ALU.zero), //need to 
-    .ALUdata_i (ALU.data_o), //
-    .RegWaddr_i (), 
-    .MemWdata_i (),
+    .Adderdata_i (IAdd.data_o), 
+    .ALUzero_i (ALU.Zero_o), 
+    .ALUdata_i (ALU.data_o), 
+    .RegWaddr_i (MUX_RegDst.data_o), 
+    .MemWdata_i (), //TODO: wire for IDEX RTData out
     .RegWrite_o (),
     .MemtoReg_o (),
     .Branch_o (),
