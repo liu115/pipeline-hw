@@ -16,12 +16,13 @@ wire zero;
 // eg: *_i(X.*_o)
 wire [31:0] addpc_out;
 wire [31:0] ALUresult;
+
 Control Control(
-    .Op_i       (inst[31:26]),
-    .RegDst_o   (MUX_RegDst.select_i),
-    .ALUOp_o    (ALU_Control.ALUOp_i),
-    .ALUSrc_o   (MUX_ALUSrc.select_i),
-    .RegWrite_o (Registers.RegWrite_i)
+    .Op_i       (inst[31:26]), // TODO: need more bits of inst
+    .RegDst_o   (),
+    .ALUOp_o    (),
+    .ALUSrc_o   (),
+    .RegWrite_o ()
 );
 
 
@@ -53,8 +54,8 @@ Registers Registers(
     .RDaddr_i   (MEMWB.RegWaddr_o),
     .RDdata_i   (MUX_RegSrc.data_o),
     .RegWrite_i (MEMWB.RegWrite_o),
-    .RSdata_o   (ALU.data1_i),
-    .RTdata_o   (MUX_ALUSrc.data1_i)
+    .RSdata_o   (),
+    .RTdata_o   ()
 );
 
 Data_Memory Data_Memory(
@@ -84,10 +85,10 @@ MUX32 MUX_RegSrc(
 );
 
 MUX5 MUX_RegDst(
-    .data1_i    (inst[20:16]),
-    .data2_i    (inst[15:11]),
-    .select_i   (Control.RegDst_o),
-    .data_o     (Registers.RDaddr_i)
+    .data1_i    (inst[20:16]),  //TODO: change to take from IDEX
+    .data2_i    (inst[15:11]),  //TODO
+    .select_i   (IDEX.RegDst_o),
+    .data_o     ()
 );
 
 
@@ -103,7 +104,7 @@ MUX32 MUX_ALUSrc(
 
 Sign_Extend Sign_Extend(
     .data_i     (inst[15:0]),
-    .data_o     (MUX_ALUSrc.data2_i)
+    .data_o     ()
 );
 
 
