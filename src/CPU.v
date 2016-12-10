@@ -14,7 +14,7 @@ wire [31:0] inst_addr, inst;
 wire zero;
 // write only the in-port =, left out-port blank
 // eg: *_i(X.*_o)
-
+wire [31:0] addpc_out;
 
 Control Control(
     .Op_i       (inst[31:26]),
@@ -29,7 +29,7 @@ Control Control(
 Adder Add_PC(
     .data1_in   (inst_addr),
     .data2_in   (32'd4),
-    .data_o     (PC.pc_i)
+    .data_o     (addpc_out)
 );
 
 
@@ -37,13 +37,13 @@ PC PC(
     .clk_i      (clk_i),
     .rst_i      (rst_i),
     .start_i    (start_i),
-    .pc_i       (Add_PC.data_o),
+    .pc_i       (MUX_PCSrc.data_o),
     .pc_o       (inst_addr)
 );
 
 Instruction_Memory Instruction_Memory(
     .addr_i     (inst_addr),
-    .instr_o    (inst)
+    .instr_o    ()
 );
 
 Registers Registers(
@@ -59,9 +59,9 @@ Registers Registers(
 
 // 0: PC = PC+4, 1: EXMEM Add result
 MUX32 MUX_PCSrc(
-    .data1_i (),
-    .data2_i (),
-    .select_i (),
+    .data1_i (addpc_out),
+    .data2_i (),    //EXMEM add result
+    .select_i (),   //PCsrc control signal
     .data_o ()
 );
 
@@ -114,5 +114,13 @@ ALU_Control ALU_Control(
     .ALUCtrl_o  (ALU.ALUCtrl_i)
 );
 
+IFID IFID(
+    .clk_i (clk_i),
+    .start_i (start_i),
+    .addr_i (addpc_out),
+    .inst_i (Instruction_Memory.instr_o),
+    .addr_o (),
+    .inst_o (inst)
+);
 
 endmodule
