@@ -15,7 +15,7 @@ wire zero;
 // write only the in-port =, left out-port blank
 // eg: *_i(X.*_o)
 wire [31:0] addpc_out;
-
+wire [31:0] ALUresult;
 Control Control(
     .Op_i       (inst[31:26]),
     .RegDst_o   (MUX_RegDst.select_i),
@@ -57,11 +57,21 @@ Registers Registers(
     .RTdata_o   (MUX_ALUSrc.data1_i)
 );
 
+Data_Memory Data_Memory(
+    .addr_i (ALUresult),
+    .data_i (EXMEM.MemWdata_o),
+    .MemWrite_i (EXMEM.MemWrite_o),
+    .MemRead_i (EXMEM.MemRead_o),
+    .data_o ()
+);
+
 // 0: PC = PC+4, 1: EXMEM Add result
+wire PCSrc_select;
+assign PCSrc_select = EXMEM.Branch_o & EXMEM.ALUzero_o;
 MUX32 MUX_PCSrc(
     .data1_i (addpc_out),
-    .data2_i (),    //EXMEM add result
-    .select_i (),   //PCsrc control signal
+    .data2_i (EXMEM.Adderdata_o),    //EXMEM add result
+    .select_i (PCSrc_select),   //PCsrc control signal
     .data_o ()
 );
 
@@ -121,6 +131,45 @@ IFID IFID(
     .inst_i (Instruction_Memory.instr_o),
     .addr_o (),
     .inst_o (inst)
+);
+
+EXMEM EXMEM (
+    .clk_i (clk_i),
+    .start_i (start_i),
+    .RegWrite_i (IDEX.RegWrite_o),
+    .MemtoReg_i (IDEX.MemtoReg_o),
+    .Branch_i (IDEX.Branch_o),
+    .MemRead_i (IDEX.MemRead_o),
+    .MemWrite_i (IDEX.MemWrite_o),
+    .Adderdata_i (), // adder result
+    .ALUzero_i (ALU.zero), //need to 
+    .ALUdata_i (ALU.data_o), //
+    .RegWaddr_i (), 
+    .MemWdata_i (),
+    .RegWrite_o (),
+    .MemtoReg_o (),
+    .Branch_o (),
+    .MemRead_o (),
+    .MemWrite_o (),
+    .Adderdata_o (),
+    .ALUzero_o (),
+    .ALUdata_o (ALUresult),
+    .RegWaddr_o (),
+    .MemWdata_o ()
+);
+MEMWB MEMWB(
+	clk_i (clk_i),
+	start_i (start_i),
+	RegWrite_i (EXMEM.RegWrite_o),
+	MemtoReg_i (EXMEM.MemtoReg_o),
+	ReadData_i (Data_Memory.data_o),
+	ALUdata_i (ALUresult),
+    RegWaddr_i (EXMEM.RegWaddr_i),
+	RegWrite_o (),
+	MemtoReg_o (),
+	ReadData_o (),
+	ALUdata_o (),
+	RegWaddr_o ()
 );
 
 endmodule
