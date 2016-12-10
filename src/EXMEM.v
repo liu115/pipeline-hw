@@ -10,8 +10,8 @@ module EXMEM
 	Adderdata_i,
 	ALUzero_i,
 	ALUdata_i,
-	RTaddr_i,
-	RDaddr_i,
+    RegWaddr_i,
+    MemWdata_i,
 	RegWrite_o,
 	MemtoReg_o,
 	Branch_o,
@@ -20,21 +20,23 @@ module EXMEM
 	Adderdata_o,
 	ALUzero_o,
 	ALUdata_o,
-	RTaddr_o,
-	RDaddr_o
+    RegWaddr_o,
+    MemWdata_o
 );
 
 input clk_i, start_i;
 input RegWrite_i, MemtoReg_i, Branch_i, MemRead_i, MemWrite_i, ALUzero_i;
 input [31:0] Adderdata_i, ALUdata_i;
-input [4:0]  RTaddr_i, RDaddr_i;
+input [4:0] RegWaddr_i;
+input [31:0] MemWdata_i;
 output RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, ALUzero_o;
 output [31:0] Adderdata_o, ALUdata_o;
-output [4:0]  RTaddr_o, RDaddr_o;
+output [4:0] RegWaddr_o;
+output [31:0] MemWdata_o;
 reg RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, ALUzero_o;
 reg [31:0] Adderdata_o, ALUdata_o;
-reg [4:0]  RTaddr_o, RDaddr_o;
-
+reg [4:0]  RegWaddr_o;
+reg [31:0] MemWdata_o;
 always @ ( posedge clk_i or negedge start_i) begin
   if (~start_i) begin 
 	RegWrite_o <= 0;
@@ -45,8 +47,8 @@ always @ ( posedge clk_i or negedge start_i) begin
 	Adderdata_o <= 0;
 	ALUzero_o <= 0;
 	ALUdata_o <= 0;
-	RTaddr_o <= 0;
-	RDaddr_o <= 0;
+	RegWaddr_o <= 0;
+    MemWdata_o <= 0;
   end
   else begin    
 	RegWrite_o <= RegWrite_i;
@@ -57,8 +59,8 @@ always @ ( posedge clk_i or negedge start_i) begin
 	Adderdata_o <= Adderdata_i;
 	ALUzero_o <= ALUzero_i;
 	ALUdata_o <= ALUdata_i;
-	RTaddr_o <= RTaddr_i;
-	RDaddr_o <= RDaddr_i;
+	RegWaddr_o <= RegWaddr_i;
+    MemWdata_o <= MemWdata_i;
   end
 end
 endmodule

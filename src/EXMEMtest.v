@@ -4,10 +4,12 @@ reg Clk;
 reg Start;
 reg i0, i1, i2, i3, i4, i6;
 reg [31:0] i5, i7;
-reg [4:0] i8, i9;
+reg [4:0] i8;
+reg [31:0] i9;
 wire o0, o1, o2, o3, o4, o6;
 wire [31:0] o5, o7;
-wire [4:0] o8, o9;
+wire [4:0] o8;
+wire [31:0] o9;
 integer counter;
 always #(`CYCLE_TIME/2) Clk = ~Clk;
 
@@ -29,7 +31,7 @@ initial begin
   i6 = 1'b0;
   i7 = 32'd7;
   i8 = 5'd8;
-  i9 = 5'd9;
+  i9 = 32'd9;
 
   #(`CYCLE_TIME/4)
   Start = 1;
@@ -52,7 +54,7 @@ always@(posedge Clk) begin
   if (counter == 5)
     $finish;
   //change the input and output you want to show
-  $display("%dns %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", $stime, i0, i1, i2, i3, i4, i5, i6, i7, i8, i9, o0, o1, o2, o3, o4, o5, o6, o7, o8, o9);
+  $display("%dns %d %d %d %d %d %d %d %d %d %d\n %d %d %d %d %d %d %d %d %d %d", $stime, i0, i1, i2, i3, i4, i5, i6, i7, i8, i9, o0, o1, o2, o3, o4, o5, o6, o7, o8, o9);
 
   
   counter = counter + 1;
