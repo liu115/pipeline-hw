@@ -50,9 +50,9 @@ Registers Registers(
     .clk_i      (clk_i),
     .RSaddr_i   (inst[25:21]),
     .RTaddr_i   (inst[20:16]),
-    .RDaddr_i   (MUX_RegDst.data_o),
-    .RDdata_i   (ALU.data_o), //ALU Result
-    .RegWrite_i (Control.RegWrite_o),
+    .RDaddr_i   (MEMWB.RegWaddr_o),
+    .RDdata_i   (MUX_RegSrc.data_o),
+    .RegWrite_i (MEMWB.RegWrite_o),
     .RSdata_o   (ALU.data1_i),
     .RTdata_o   (MUX_ALUSrc.data1_i)
 );
@@ -77,9 +77,9 @@ MUX32 MUX_PCSrc(
 
 // 1: Mem to Reg, 0: ALU result to Reg (from EXMEM)
 MUX32 MUX_RegSrc(
-    .data1_i (),
-    .data2_i (),
-    .select_i (),
+    .data1_i (MEMWB.ALUdata_o),
+    .data2_i (MEMWB.ReadData_o),
+    .select_i (MEMWB.MemtoReg),
     .data_o ()
 );
 
