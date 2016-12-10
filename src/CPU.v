@@ -12,7 +12,8 @@ input               start_i;
 
 wire [31:0] inst_addr, inst;
 wire zero;
-
+// write only the in-port =, left out-port blank
+// eg: *_i(X.*_o)
 
 
 Control Control(
@@ -56,6 +57,21 @@ Registers Registers(
     .RTdata_o   (MUX_ALUSrc.data1_i)
 );
 
+// 0: PC = PC+4, 1: EXMEM Add result
+MUX32 MUX_PCSrc(
+    .data1_i (),
+    .data2_i (),
+    .select_i (),
+    .data_o ()
+);
+
+// 1: Mem to Reg, 0: ALU result to Reg (from EXMEM)
+MUX32 MUX_RegSrc(
+    .data1_i (),
+    .data2_i (),
+    .select_i (),
+    .data_o ()
+);
 
 MUX5 MUX_RegDst(
     .data1_i    (inst[20:16]),
