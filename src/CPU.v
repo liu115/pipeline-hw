@@ -18,7 +18,7 @@ wire [31:0] addpc_out;
 wire [31:0] ALUresult;
 
 Control Control(
-    .Op_i       (inst[31:26]), // TODO: need more bits of inst
+    .Op_i       (inst[31:26]),
     .RegDst_o   (),
     .ALUOp_o    (),
     .ALUSrc_o   (),
@@ -30,7 +30,7 @@ Control Control(
 Adder Add_PC(
     .data1_in   (inst_addr),
     .data2_in   (32'd4),
-    .data_o     (addpc_out)
+    .data_o     ()
 );
 
 Adder IAdd (
@@ -44,7 +44,7 @@ PC PC(
     .rst_i      (rst_i),
     .start_i    (start_i),
     .pc_i       (MUX_PCSrc.data_o),
-    .pc_o       (inst_addr)
+    .pc_o       ()
 );
 
 Instruction_Memory Instruction_Memory(
@@ -127,7 +127,7 @@ ALU ALU(
 ALU_Control ALU_Control(
     .funct_i    (inst[5:0]),
     .ALUOp_i    (Control.ALUOp_o),
-    .ALUCtrl_o  (ALU.ALUCtrl_i)
+    .ALUCtrl_o  ()
 );
 
 IFID IFID(
@@ -136,7 +136,7 @@ IFID IFID(
     .addr_i (addpc_out),
     .inst_i (Instruction_Memory.instr_o),
     .addr_o (),
-    .inst_o (inst)
+    .inst_o ()
 );
 
 IDEX IDEX(
@@ -192,7 +192,7 @@ EXMEM EXMEM (
     .MemWrite_o (),
     .Adderdata_o (),
     .ALUzero_o (),
-    .ALUdata_o (ALUresult),
+    .ALUdata_o (),
     .RegWaddr_o (),
     .MemWdata_o ()
 );
