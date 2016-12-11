@@ -203,12 +203,28 @@ MEMWB MEMWB(
 	.MemtoReg_i (EXMEM.MemtoReg_o),
 	.ReadData_i (Data_Memory.data_o),
 	.ALUdata_i (ALUresult),
-    .RegWaddr_i (EXMEM.RegWaddr_o),
+	.RegWaddr_i (EXMEM.RegWaddr_o),
 	.RegWrite_o (),
 	.MemtoReg_o (),
 	.ReadData_o (),
 	.ALUdata_o (),
 	.RegWaddr_o ()
 );
+MUX8 MUX8(
+    .data1_i (), 
+    .data2_i (8'd0), 
+    .select_i (HazardDetection_Unit.ControlSrc_o), 
+    .data_o ()
+);
+HazardDetection_Unit HazardDetection_Unit(
+    .IDEXMemRead_i (IDEX.MemRead_o), 
+    .IDEXRt_i (IDEX.RTdata_o),
+    .IFIDRs_i (IFID.RSdata_o), 
+    .IFIDRt_i (IFID.RTdata_o), 
+    .PCWrite_o (), 
+    .IFIDWrite_o (), 
+    .ControlSrc_o ()
+);
+
 
 endmodule
