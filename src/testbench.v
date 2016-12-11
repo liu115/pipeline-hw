@@ -37,8 +37,8 @@ initial begin
     end
     
     // Load instructions into instruction memory
-    //$readmemb("instruction.txt", CPU.Instruction_Memory.memory);
     $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    //$readmemb("Fibonacci_instruction.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     outfile = $fopen("output.txt") | 1;
@@ -58,19 +58,22 @@ initial begin
 end
   
 always@(posedge Clk) begin
-    if(counter == 10)    // stop after 30 cycles
-        $stop;
+    if(counter == 30)    // stop after 30 cycles
+        $finish;
 
     // put in your own signal to count stall and flush
-    // if(CPU.HazzardDetection.mux8_o == 1 && CPU.Control.Jump_o == 0 && CPU.Control.Branch_o == 0)stall = stall + 1;
-    // if(CPU.HazzardDetection.Flush_o == 1)flush = flush + 1;  
+     if(CPU.IFID.IFIDWrite_i == 1 && CPU.PC.PCWrite_i == 1) stall = stall + 1;
+     if(CPU.IFID.Flush_i == 1) flush = flush + 1;  
 
     // print PC
     $fdisplay(outfile, "cycle = %d, Start = %d, Stall = %d, Flush = %d\nPC = %d", counter, Start, stall, flush, CPU.PC.pc_o);
+    /*$fdisplay(outfile, "Stall: %d %d %b %b\n", CPU.HazardDetection_Unit.PCWrite_o, CPU.HazardDetection_Unit.IFIDWrite_o, CPU.IFID.inst_i,  CPU.IFID.inst_o);
+    $fdisplay(outfile, "Forward: %b %b %b %b\n", CPU.Forwarding_Unit.ForwardA_o, CPU.Forwarding_Unit.ForwardB_o, CPU.Forwarding_Unit.IDEXRs_i, CPU.Forwarding_Unit.IDEXRt_i);
     $fdisplay(outfile, "EXMEM: %b %d %d\n", CPU.EXMEM.RegWaddr_i, CPU.EXMEM.ALUdata_i , CPU.EXMEM.RegWrite_i);
+    $fdisplay(outfile, "EXMEM: %b %d %d\n", CPU.EXMEM.ALUdata_i, CPU.EXMEM.MemWdata_i , CPU.EXMEM.MemWrite_i);
     $fdisplay(outfile, "MEMWB: %b %d %d\n", CPU.MEMWB.RegWaddr_i, CPU.MEMWB.ALUdata_i , CPU.MEMWB.RegWrite_i);
     $fdisplay(outfile, "Register Write: %b %d %d\n", CPU.Registers.RDaddr_i, CPU.Registers.RDdata_i,CPU.Registers.RegWrite_i);
-    
+    */
     // print Registers
     $fdisplay(outfile, "Registers");
     $fdisplay(outfile, "R0(r0) = %d, R8 (t0) = %d, R16(s0) = %d, R24(t8) = %d", CPU.Registers.register[0], CPU.Registers.register[8] , CPU.Registers.register[16], CPU.Registers.register[24]);
