@@ -91,8 +91,8 @@ MUX32 MUX_RegSrc(
 );
 
 MUX5 MUX_RegDst(
-    .data1_i    (IDEX.RSaddr_o), 
-    .data2_i    (IDEX.RTaddr_o), 
+    .data1_i    (IDEX.RTaddr_o), 
+    .data2_i    (IDEX.RDaddr_o), 
     .select_i   (IDEX.RegDst_o),
     .data_o     ()
 );
@@ -155,8 +155,8 @@ IDEX IDEX(
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
     .Sign_Extend_o (IOperand), 
-    .RSaddr_i (inst[20:16]), 
-    .RTaddr_i (inst[15:11]), 
+    .RTaddr_i (inst[20:16]), 
+    .RDaddr_i (inst[15:11]), 
     .RegWrite_o (), 
     .MemtoReg_o (), 
     .Branch_o (), 
@@ -168,8 +168,8 @@ IDEX IDEX(
     .addr_o (), 
     .RSdata_o (), 
     .RTdata_o (IDEXRTdata_o), 
-    .RSaddr_o (), 
-    .RTaddr_o ()
+    .RTaddr_o (), 
+    .RDaddr_o ()
 );
 
 EXMEM EXMEM (
