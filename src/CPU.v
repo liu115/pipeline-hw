@@ -136,7 +136,7 @@ IFID IFID(
     .addr_i (addpc_out),
     .inst_i (Instruction_Memory.instr_o),
     .addr_o (),
-    .inst_o ()
+    .inst_o (inst)
 );
 
 IDEX IDEX(
@@ -192,7 +192,7 @@ EXMEM EXMEM (
     .MemWrite_o (),
     .Adderdata_o (),
     .ALUzero_o (),
-    .ALUdata_o (),
+    .ALUdata_o (ALUresult),
     .RegWaddr_o (),
     .MemWdata_o ()
 );
