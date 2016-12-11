@@ -18,8 +18,8 @@ module IDEX
     ALUOp_o, 
     ALUSrc_i, 
     ALUSrc_o, 
-    Adder_i, //Adder
-    Adder_o,  
+    addr_i, //address of instruction memory
+    addr_o,  
     RSdata_i, //Registers
     RSdata_o, 
     RTdata_i, 
@@ -44,7 +44,7 @@ input RegWrite_i, //WB
 input [1:0] ALUOp_i;
 input [4:0] data1_i, 
 	    data2_i;
-input [31:0] Adder_i, 
+input [31:0] addr_i, 
 	     Sign_Extend_i,
 	     RSdata_i, 
 	     RTdata_i;
@@ -60,7 +60,7 @@ output RegWrite_o, //WB
 output [1:0] ALUOp_o;
 output [4:0] data1_o, 
 	     data2_o;
-output [31:0] Adder_o, 
+output [31:0] addr_o, 
 	      Sign_Extend_o, 
 	      RSdata_o, 
 	      RTdata_o;
@@ -74,7 +74,7 @@ reg RegWrite_o, //  output
     ALUOp_o, // output 2
     data1_o, //output 5
     data2_o, 
-    Adder_o, //output 32
+    addr_o, //output 32
     Sign_Extend_o, 
     RSdata_o, 
     RTdata_o;
@@ -92,7 +92,7 @@ always @ ( posedge clk_i or negedge start_i) begin
 	ALUOp_o <= 0;
 	data1_o <= 0;
 	data2_o <= 0;
-	Adder_o <= 0;
+	addr_o <= 0;
 	Sign_Extend_o <= 0;
 	RSdata_o <= 0;
 	RTdata_o <= 0;
@@ -108,7 +108,7 @@ always @ ( posedge clk_i or negedge start_i) begin
 	ALUOp_o <= ALUOp_i;
 	data1_o <= data1_i;
 	data2_o <= data2_i;
-	Adder_o <= Adder_i;
+	addr_o <= addr_i;
 	Sign_Extend_o <= Sign_Extend_i;
 	RSdata_o <= RSdata_i;
 	RTdata_o <= RTdata_i;

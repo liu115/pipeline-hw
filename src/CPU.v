@@ -34,8 +34,8 @@ Adder Add_PC(
 );
 
 Adder IAdd (
-    .data1_in (IDEX.addr_o), //TODO: not sure
-    .data2_in (IDEX.Signextend_o << 2), //same
+    .data1_in (IDEX.addr_o), 
+    .data2_in (IDEX.Sign_Extend_o << 2),
     .data_o ()
 );
 
@@ -150,7 +150,7 @@ IDEX IDEX(
     .RegDst_i (Control.RegDst_o), 
     .ALUOp_i (Control.ALUOp_o), 
     .ALUSrc_i (Control.ALUSrc_o), 
-    .Adder_i (IFID.addr_o), 
+    .addr_i (IFID.addr_o), 
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
@@ -165,7 +165,7 @@ IDEX IDEX(
     .RegDst_o (), 
     .ALUOp_o (), 
     .ALUSrc_o (), 
-    .Adder_o (), 
+    .addr_o (), 
     .RSdata_o (), 
     .RTdata_o (), 
     .data1_o (), 
