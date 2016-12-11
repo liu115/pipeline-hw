@@ -139,6 +139,39 @@ IFID IFID(
     .inst_o (inst)
 );
 
+IDEX IDEX(
+    .clk_i (clk_i), 
+    .start_i (start_i), 
+    .RegWrite_i (Control.RegWrite_o), 
+    .RegWrite_o (), 
+    .MemtoReg_i (Control.MemtoReg_o), 
+    .MemtoReg_o (), 
+    .Branch_i (Control.Branch_o), 
+    .Branch_o (), 
+    .MemRead_i (Control.MemRead_o), 
+    .MemRead_o (), 
+    .MemWrite_i (Control.MemWrite_o), 
+    .MemWrite_o (), 
+    .RegDst_i (Control.RegDst_o), 
+    .RegDst_o (), 
+    .ALUOp_i (Control.ALUOp_o), 
+    .ALUOp_o (), 
+    .ALUSrc_i (Control.ALUSrc_o), 
+    .ALUSrc_o (), 
+    .Adder_i (IFID.addr_o), 
+    .Adder_o (), 
+    .RSdata_i (Registers.RSdata_o), 
+    .RSdata_o (), 
+    .RTdata_i (Registers.RTdata_o), 
+    .RTdata_o (), 
+    .Sign_Extend_i (Sign_Extend.data_o), 
+    .Sign_Extend_o (), 
+    .data1_i (inst[20:16]), 
+    .data1_o (), 
+    .data2_i (inst[15:11]), 
+    .data2_o ()
+);
+
 EXMEM EXMEM (
     .clk_i (clk_i),
     .start_i (start_i),
