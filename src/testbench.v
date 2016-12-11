@@ -4,6 +4,7 @@ module TestBench;
 
 reg                Clk;
 reg                Start;
+reg Reset;
 integer            i, outfile, counter;
 integer            stall, flush;
 
@@ -11,7 +12,8 @@ always #(`CYCLE_TIME/2) Clk = ~Clk;
 
 CPU CPU(
     .clk_i  (Clk),
-    .start_i(Start)
+    .start_i(Start),
+    .rst_i (Reset)
 );
   
 initial begin
@@ -35,7 +37,8 @@ initial begin
     end
     
     // Load instructions into instruction memory
-    $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    //$readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    $readmemb("easy_inst.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     outfile = $fopen("output.txt") | 1;
@@ -44,18 +47,18 @@ initial begin
     CPU.Data_Memory.memory[0] = 8'h5;       // n = 5 for example
     
     Clk = 1;
-    //Reset = 0;
+    Reset = 0;
     Start = 0;
     
     #(`CYCLE_TIME/4) 
-    //Reset = 1;
+    Reset = 1;
     Start = 1;
         
     
 end
   
 always@(posedge Clk) begin
-    if(counter == 30)    // stop after 30 cycles
+    if(counter == 10)    // stop after 30 cycles
         $stop;
 
     // put in your own signal to count stall and flush
