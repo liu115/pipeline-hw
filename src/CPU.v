@@ -265,16 +265,19 @@ Forwarding_Unit Forwarding_Unit (
     .ForwardA_o (), //MUX_ALURsSrc select
     .ForwardB_o ()  //MUX_ALURtSrc select
 );
+
+wire [7:0] MUX8_data1;
+assign MUX8_data1 = {
+	    Control.RegWrite_o, 
+	    Control.MemtoReg_o, 
+	    Control.MemRead_o, 
+	    Control.MemWrite_o, 
+	    Control.RegDst_o, 
+	    Control.ALUOp_o, 
+	    Control.ALUSrc_o 
+};
 MUX8 MUX8(
-    .data1_i ({
-	    RegWrite_o, 
-	    MemtoReg_o, 
-	    MemRead_o, 
-	    MemWrite_o, 
-	    RegDst_o, 
-	    ALUOp_o, 
-	    ALUSrc_o 
-	    }), 
+    .data1_i (MUX8_data1), 
     .data2_i (8'd0), 
     .select_i (HazardDetection_Unit.ControlSrc_o), 
     .data_o ()
