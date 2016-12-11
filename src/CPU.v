@@ -228,7 +228,7 @@ EXMEM EXMEM (
     .MemtoReg_i (IDEX.MemtoReg_o),
     .MemRead_i (MemRead_out),
     .MemWrite_i (IDEX.MemWrite_o),
-    .ALUdata_i (ALU.data_o), 
+    .ALUdata_i (ALU.data_o),
     .RegWaddr_i (MUX_RegDst.data_o), 
     .MemWdata_i (ALURtSrc),
     .RegWrite_o (EXMEMRegWrite_o),
@@ -284,7 +284,7 @@ MUX8 MUX8(
 );
 HazardDetection_Unit HazardDetection_Unit(
     .IDEXMemRead_i (MemRead_out), 
-    .IDEXRt_i (IDEX_RTdata),
+    .IDEXRt_i (IDEX_RTaddr),
     .IFIDRs_i (inst[25:21]), 
     .IFIDRt_i (inst[20:16]), 
     .PCWrite_o (), 
