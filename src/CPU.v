@@ -173,12 +173,13 @@ ALU_Control ALU_Control(
 );
 
 IFID IFID(
-    .clk_i (clk_i),
-    .start_i (start_i),
-    .addr_i (addpc_out),
-    .inst_i (Instruction_Memory.instr_o),
-    .addr_o (IFIDaddr_o),
-    .inst_o (inst)
+    .clk_i 	(clk_i),
+    .start_i 	(start_i),
+    .addr_i 	(addpc_out),
+    .inst_i 	(Instruction_Memory.instr_o),
+    .Flush_i	(branch | jump),
+    .addr_o	(IFIDaddr_o),
+    .inst_o	(inst)
 );
 wire [4:0] IDEX_RTaddr;
 IDEX IDEX(
