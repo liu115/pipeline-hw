@@ -192,7 +192,7 @@ IDEX IDEX(
     .RegDst_i (Control.RegDst_o), 
     .ALUOp_i (Control.ALUOp_o), 
     .ALUSrc_i (Control.ALUSrc_o), 
-    .addr_i (IFID.addr_o), 
+    .addr_i (IFIDaddr_o), 
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
