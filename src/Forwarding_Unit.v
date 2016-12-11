@@ -11,7 +11,7 @@ module Forwarding_Unit (
 
 input EXMEMRegWrite_i, MEMWBRegWrite_i;
 input [4:0] IDEXRs_i, IDEXRt_i;
-input [31:0] EXMEMRd_i, MEMWBRd_i;
+input [4:0] EXMEMRd_i, MEMWBRd_i;
 output [1:0] ForwardA_o, ForwardB_o; //ALU Operand first and second
 
 reg [1:0] ForwardA_o, ForwardB_o; //ALU Operand first and second
