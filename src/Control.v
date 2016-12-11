@@ -18,7 +18,7 @@ reg RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, RegDst_o, ALUSrc_o;
 reg [1:0] ALUOp_o;
 
 always@(Op_i)begin
-	case( Op_i )
+    case( Op_i )
 	6'b000000: begin // R-type
 		RegWrite_o <= 1'b1;
 		MemtoReg_o <= 1'b0;
@@ -41,7 +41,7 @@ always@(Op_i)begin
 		ALUSrc_o <= 1'b1;
 	end
 
-	6'b100010: begin // lw
+	6'b100011: begin // lw
 		RegWrite_o <= 1'b1;
 		MemtoReg_o <= 1'b1;
 		Branch_o <= 1'b0;

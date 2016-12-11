@@ -16,9 +16,10 @@ wire zero;
 // eg: *_i(X.*_o)
 wire [31:0] addpc_out;
 wire [31:0] ALUresult;
-
+wire [31:0] IOperand; // Output of SignExtend from IDEX (inst[15:0])
+wire [31:0] IDEXRTdata_o; //Output of RTdata from IDEX
 Control Control(
-    .Op_i       (inst[31:26]), // TODO: need more bits of inst
+    .Op_i       (inst[31:26]),
     .RegDst_o   (),
     .ALUOp_o    (),
     .ALUSrc_o   (),
@@ -34,8 +35,8 @@ Adder Add_PC(
 );
 
 Adder IAdd (
-    .data1_in (IDEX.addr_o), //TODO: not sure
-    .data2_in (IDEX.Signextend_o << 2), //same
+    .data1_in (IDEX.addr_o), 
+    .data2_in (IOperand << 2),
     .data_o ()
 );
 
@@ -85,13 +86,13 @@ MUX32 MUX_PCSrc(
 MUX32 MUX_RegSrc(
     .data1_i (MEMWB.ALUdata_o),
     .data2_i (MEMWB.ReadData_o),
-    .select_i (MEMWB.MemtoReg),
+    .select_i (MEMWB.MemtoReg_o),
     .data_o ()
 );
 
 MUX5 MUX_RegDst(
-    .data1_i    (IDEX.data1_o), 
-    .data2_i    (IDEX.data2_o), 
+    .data1_i    (IDEX.RTaddr_o), 
+    .data2_i    (IDEX.RDaddr_o), 
     .select_i   (IDEX.RegDst_o),
     .data_o     ()
 );
@@ -99,14 +100,13 @@ MUX5 MUX_RegDst(
 
 
 MUX32 MUX_ALUSrc(
-    .data1_i    (IDEX.RTdata_o), //TODO: IDEX to wire
-    .data2_i    (Sign_Extend.data_o),
+    .data1_i    (IDEXRTdata_o),
+    .data2_i    (IOperand),
     .select_i   (IDEX.ALUSrc_o),
     .data_o     ()
 );
 
 
-// TODO: sign extend output need a wire to split up
 Sign_Extend Sign_Extend(
     .data_i     (inst[15:0]),
     .data_o     ()
@@ -115,7 +115,7 @@ Sign_Extend Sign_Extend(
 
 
 ALU ALU(
-    .data1_i    (Registers.RSdata_o),
+    .data1_i    (IDEX.RSdata_o),
     .data2_i    (MUX_ALUSrc.data_o),
     .ALUCtrl_i  (ALU_Control.ALUCtrl_o),
     .data_o     (),
@@ -125,9 +125,9 @@ ALU ALU(
 
 
 ALU_Control ALU_Control(
-    .funct_i    (inst[5:0]),
+    .funct_i    (IOperand[5:0]),
     .ALUOp_i    (Control.ALUOp_o),
-    .ALUCtrl_o  (ALU.ALUCtrl_i)
+    .ALUCtrl_o  ()
 );
 
 IFID IFID(
@@ -150,13 +150,13 @@ IDEX IDEX(
     .RegDst_i (Control.RegDst_o), 
     .ALUOp_i (Control.ALUOp_o), 
     .ALUSrc_i (Control.ALUSrc_o), 
-    .Adder_i (IFID.addr_o), 
+    .addr_i (IFID.addr_o), 
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
-    .Sign_Extend_o (), 
-    .data1_i (inst[20:16]), 
-    .data2_i (inst[15:11]), 
+    .Sign_Extend_o (IOperand), 
+    .RTaddr_i (inst[20:16]), 
+    .RDaddr_i (inst[15:11]), 
     .RegWrite_o (), 
     .MemtoReg_o (), 
     .Branch_o (), 
@@ -165,11 +165,11 @@ IDEX IDEX(
     .RegDst_o (), 
     .ALUOp_o (), 
     .ALUSrc_o (), 
-    .Adder_o (), 
+    .addr_o (), 
     .RSdata_o (), 
-    .RTdata_o (), 
-    .data1_o (), 
-    .data2_o ()
+    .RTdata_o (IDEXRTdata_o), 
+    .RTaddr_o (), 
+    .RDaddr_o ()
 );
 
 EXMEM EXMEM (
@@ -184,7 +184,7 @@ EXMEM EXMEM (
     .ALUzero_i (ALU.Zero_o), 
     .ALUdata_i (ALU.data_o), 
     .RegWaddr_i (MUX_RegDst.data_o), 
-    .MemWdata_i (), //TODO: wire for IDEX RTData out
+    .MemWdata_i (IDEXRTdata_o),
     .RegWrite_o (),
     .MemtoReg_o (),
     .Branch_o (),
@@ -197,18 +197,18 @@ EXMEM EXMEM (
     .MemWdata_o ()
 );
 MEMWB MEMWB(
-	clk_i (clk_i),
-	start_i (start_i),
-	RegWrite_i (EXMEM.RegWrite_o),
-	MemtoReg_i (EXMEM.MemtoReg_o),
-	ReadData_i (Data_Memory.data_o),
-	ALUdata_i (ALUresult),
-    RegWaddr_i (EXMEM.RegWaddr_i),
-	RegWrite_o (),
-	MemtoReg_o (),
-	ReadData_o (),
-	ALUdata_o (),
-	RegWaddr_o ()
+	.clk_i (clk_i),
+	.start_i (start_i),
+	.RegWrite_i (EXMEM.RegWrite_o),
+	.MemtoReg_i (EXMEM.MemtoReg_o),
+	.ReadData_i (Data_Memory.data_o),
+	.ALUdata_i (ALUresult),
+    .RegWaddr_i (EXMEM.RegWaddr_o),
+	.RegWrite_o (),
+	.MemtoReg_o (),
+	.ReadData_o (),
+	.ALUdata_o (),
+	.RegWaddr_o ()
 );
 
 endmodule
