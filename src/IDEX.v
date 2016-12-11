@@ -26,10 +26,10 @@ module IDEX
     RTdata_o, 
     Sign_Extend_i, //Sign_Extend
     Sign_Extend_o, 
-    data1_i, //MUX5  //instr[20:16]
-    data1_o,         
-    data2_i,         //instr[15:11]
-    data2_o
+    RSaddr_i, //MUX5  //instr[20:16]
+    RSaddr_o,         
+    RTaddr_i,         //instr[15:11]
+    RTaddr_o
 );
 
 input clk_i, start_i;
@@ -42,8 +42,8 @@ input RegWrite_i, //WB
       //ALUOp
       ALUSrc_i;
 input [1:0] ALUOp_i;
-input [4:0] data1_i, 
-	    data2_i;
+input [4:0] RSaddr_i, 
+	    RTaddr_i;
 input [31:0] addr_i, 
 	     Sign_Extend_i,
 	     RSdata_i, 
@@ -58,8 +58,8 @@ output RegWrite_o, //WB
        ALUSrc_o;
 
 output [1:0] ALUOp_o;
-output [4:0] data1_o, 
-	     data2_o;
+output [4:0] RSaddr_o, 
+	     RTaddr_o;
 output [31:0] addr_o, 
 	      Sign_Extend_o, 
 	      RSdata_o, 
@@ -72,8 +72,8 @@ reg RegWrite_o, //  output
     RegDst_o, 
     ALUSrc_o, 
     ALUOp_o, // output 2
-    data1_o, //output 5
-    data2_o, 
+    RSaddr_o, //output 5
+    RTaddr_o, 
     addr_o, //output 32
     Sign_Extend_o, 
     RSdata_o, 
@@ -90,8 +90,8 @@ always @ ( posedge clk_i or negedge start_i) begin
 	RegDst_o <= 0;
 	ALUSrc_o <= 0;
 	ALUOp_o <= 0;
-	data1_o <= 0;
-	data2_o <= 0;
+	RSaddr_o <= 0;
+	RTaddr_o <= 0;
 	addr_o <= 0;
 	Sign_Extend_o <= 0;
 	RSdata_o <= 0;
@@ -106,8 +106,8 @@ always @ ( posedge clk_i or negedge start_i) begin
 	RegDst_o <= RegDst_i;
 	ALUSrc_o <= ALUSrc_i;
 	ALUOp_o <= ALUOp_i;
-	data1_o <= data1_i;
-	data2_o <= data2_i;
+	RSaddr_o <= RSaddr_i;
+	RTaddr_o <= RTaddr_i;
 	addr_o <= addr_i;
 	Sign_Extend_o <= Sign_Extend_i;
 	RSdata_o <= RSdata_i;
