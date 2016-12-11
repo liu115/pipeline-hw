@@ -41,7 +41,7 @@ always@(Op_i)begin
 		ALUSrc_o <= 1'b1;
 	end
 
-	6'b100010: begin // lw
+	6'b100011: begin // lw
 		RegWrite_o <= 1'b1;
 		MemtoReg_o <= 1'b1;
 		Branch_o <= 1'b0;
