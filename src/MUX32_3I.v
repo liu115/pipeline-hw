@@ -1,4 +1,4 @@
-module MUX32 (data1_i, data2_i, data3_i , select_i, data_o);
+module MUX32_3I (data1_i, data2_i, data3_i , select_i, data_o);
 
 input [31:0] data1_i, data2_i, data3_i;
 input [1:0] select_i;

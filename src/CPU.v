@@ -62,8 +62,13 @@ Instruction_Memory Instruction_Memory(
     .addr_i     (inst_addr),
     .instr_o    ()
 );
+
 wire [31:0] RegSrc;
 wire [31:0] RegRSdata_o, RegRTdata_o;
+wire [31:0] ALURtSrc;
+wire [4:0] IDEX_RTaddr;
+wire EXMEMRegWrite_o, MEMWBRegWrite_o;
+wire [4:0] EXMEM_RDaddr, MEMWB_RDaddr;
 
 Registers Registers(
     .clk_i      (clk_i),
@@ -85,11 +90,11 @@ Data_Memory Data_Memory(
 );
 
 // 0: PC = PC+4, 1: EXMEM Add result
-wire PCSrc_select;
-assign PCSrc_select = EXMEM.Branch_o & EXMEM.ALUzero_o;
+wire [31:0] branch_pc;
+assign branch_pc = {4'b0, inst[25:0] << 2}; 
 MUX32 MUX_PCSrc(
     .data1_i (MUX_Adderdata.data_o),
-    .data2_i ({4'b0, inst[25:0] << 2}),    //EXMEM add result
+    .data2_i (branch_pc),    //EXMEM add result
     .select_i (jump),  
     .data_o ()
 );
@@ -107,6 +112,7 @@ MUX32 MUX_Adderdata(
     .data2_i	(IAdd.data_o),
     .select_i	(branch),
     .data_o	()
+);
 
 MUX5 MUX_RegDst(
     .data1_i    (IDEX_RTaddr), 
@@ -127,12 +133,13 @@ AND AND_Branch(
     .data1_i	(Control.Branch_o),
     .data2_i	(EQ_Regdata.data_o),
     .data_o	(branch)
-)
+);
 
 EQ EQ_Regdata(
     .data1_i	(RegRSdata_o),
     .data2_i	(RegRTdata_o),
     .data_o	()
+);
 
 MUX32_3I MUX_ALURsSrc(
     .data1_i    (IDEX.RSdata_o),
@@ -142,7 +149,6 @@ MUX32_3I MUX_ALURsSrc(
     .data_o     ()
 );
 
-wire [31:0] ALURtSrc;
 MUX32_3I MUX_ALURtSrc(
     .data1_i    (IDEX.RTdata_o),
     .data2_i    (ALUresult), //ALU result from output of EXMEM
@@ -180,11 +186,11 @@ IFID IFID(
     .addr_i 	(addpc_out),
     .inst_i 	(Instruction_Memory.instr_o),
     .Flush_i	(branch | jump),
-    .IFIDWrite_i (HazardDetection_Unit.IFIDWrite_o)
+    .IFIDWrite_i (HazardDetection_Unit.IFIDWrite_o),
     .addr_o	(IFIDaddr_o),
     .inst_o	(inst)
 );
-wire [4:0] IDEX_RTaddr;
+
 IDEX IDEX(
     .clk_i (clk_i), 
     .start_i (start_i), 
@@ -215,8 +221,6 @@ IDEX IDEX(
     .RTaddr_o (IDEX_RTaddr), 
     .RDaddr_o ()
 );
-wire EXMEMRegWrite_o, MEMWBRegWrite_o;
-wire [4:0] EXMEM_RDaddr, MEMWB_RDaddr;
 EXMEM EXMEM (
     .clk_i (clk_i),
     .start_i (start_i),
@@ -224,7 +228,6 @@ EXMEM EXMEM (
     .MemtoReg_i (IDEX.MemtoReg_o),
     .MemRead_i (MemRead_out),
     .MemWrite_i (IDEX.MemWrite_o),
-    .Adderdata_i (IAdd.data_o),  
     .ALUdata_i (ALU.data_o), 
     .RegWaddr_i (MUX_RegDst.data_o), 
     .MemWdata_i (ALURtSrc),
@@ -270,7 +273,7 @@ MUX8 MUX8(
 	    MemWrite_o, 
 	    RegDst_o, 
 	    ALUOp_o, 
-	    ALUSrc_o, 
+	    ALUSrc_o 
 	    }), 
     .data2_i (8'd0), 
     .select_i (HazardDetection_Unit.ControlSrc_o), 
@@ -279,8 +282,8 @@ MUX8 MUX8(
 HazardDetection_Unit HazardDetection_Unit(
     .IDEXMemRead_i (MemRead_out), 
     .IDEXRt_i (IDEX_RTdata),
-    .IFIDRs_i (IFID.RSdata_o), 
-    .IFIDRt_i (IFID.RTdata_o), 
+    .IFIDRs_i (inst[25:21]), 
+    .IFIDRt_i (inst[20:16]), 
     .PCWrite_o (), 
     .IFIDWrite_o (), 
     .ControlSrc_o ()

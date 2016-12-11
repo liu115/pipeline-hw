@@ -15,5 +15,11 @@ MUX5.v \
 PC.v \
 Registers.v \
 Sign_Extend.v \
+MUX8.v \
+MUX32_3I.v \
+AND.v \
+EQ.v \
+Forwarding_Unit.v \
+HazardDetection_Unit.v \
 testbench.v
 
