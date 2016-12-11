@@ -23,10 +23,14 @@ wire [31:0] IFIDaddr_o;
 wire [31:0] IOperand; // Output of SignExtend from IDEX (inst[15:0])
 Control Control(
     .Op_i       (inst[31:26]),
+    .RegWrite_o	(),
+    .MemtoReg_o	(),
+    .Branch_o	(),
+    .MemRead_o	(),
+    .MemWrite_o	(),
     .RegDst_o   (),
     .ALUOp_o    (),
     .ALUSrc_o   (),
-    .RegWrite_o (),
     .Jump_o	(jump)
 );
 
