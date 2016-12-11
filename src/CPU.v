@@ -30,7 +30,7 @@ Control Control(
 Adder Add_PC(
     .data1_in   (inst_addr),
     .data2_in   (32'd4),
-    .data_o     ()
+    .data_o     (addpc_out)
 );
 
 Adder IAdd (
