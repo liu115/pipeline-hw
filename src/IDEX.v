@@ -6,8 +6,6 @@ module IDEX
     RegWrite_o, 
     MemtoReg_i, 
     MemtoReg_o,
-    Branch_i, //M
-    Branch_o, 
     MemRead_i, 
     MemRead_o, 
     MemWrite_i, 
@@ -35,7 +33,6 @@ module IDEX
 input clk_i, start_i;
 input RegWrite_i, //WB 
       MemtoReg_i, 
-      Branch_i,	  //M
       MemRead_i,
       MemWrite_i, 
       RegDst_i, //EX
@@ -50,7 +47,6 @@ input [31:0] addr_i,
 	     RTdata_i;
 output RegWrite_o, //WB 
        MemtoReg_o, 
-       Branch_o,   //M
        MemRead_o,
        MemWrite_o, 
        RegDst_o, //EX
@@ -66,7 +62,6 @@ output [31:0] addr_o,
 	      RTdata_o;
 reg RegWrite_o, //  output
     MemtoReg_o, 
-    Branch_o, 
     MemRead_o, 
     MemWrite_o, 
     RegDst_o, 
@@ -84,7 +79,6 @@ always @ ( posedge clk_i or negedge start_i) begin
     if (~start_i) begin
 	RegWrite_o <= 0;
 	MemtoReg_o <= 0;
-	Branch_o <= 0;
 	MemRead_o <= 0;
 	MemWrite_o <= 0;
 	RegDst_o <= 0;
@@ -100,7 +94,6 @@ always @ ( posedge clk_i or negedge start_i) begin
     else begin
 	RegWrite_o <= RegWrite_i;
 	MemtoReg_o <= MemtoReg_i;
-	Branch_o <= Branch_i;
 	MemRead_o <= MemRead_i;
 	MemWrite_o <= MemWrite_i;
 	RegDst_o <= RegDst_i;
