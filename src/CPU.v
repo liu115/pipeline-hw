@@ -176,7 +176,7 @@ ALU ALU(
 
 ALU_Control ALU_Control(
     .funct_i    (IOperand[5:0]),
-    .ALUOp_i    (Control.ALUOp_o),
+    .ALUOp_i    (IDEX.ALUOp_o),
     .ALUCtrl_o  ()
 );
 
