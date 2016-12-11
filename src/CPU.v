@@ -205,7 +205,8 @@ IDEX IDEX(
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
-    .Sign_Extend_o (IOperand), 
+    .Sign_Extend_o (IOperand),
+    .RSaddr_i (inst[25:21]),
     .RTaddr_i (inst[20:16]), 
     .RDaddr_i (inst[15:11]), 
     .RegWrite_o (), 
@@ -217,7 +218,8 @@ IDEX IDEX(
     .ALUSrc_o (), 
     .addr_o (), 
     .RSdata_o (), 
-    .RTdata_o (), 
+    .RTdata_o (),
+    .RSaddr_o	(),
     .RTaddr_o (IDEX_RTaddr), 
     .RDaddr_o ()
 );
