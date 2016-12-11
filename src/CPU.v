@@ -21,6 +21,7 @@ wire [31:0] ALUresult;
 wire [31:0] signedextend_out;
 wire [31:0] IFIDaddr_o;
 wire [31:0] IOperand; // Output of SignExtend from IDEX (inst[15:0])
+wire MemRead_out;
 Control Control(
     .Op_i       (inst[31:26]),
     .RegWrite_o	(),
@@ -53,6 +54,7 @@ PC PC(
     .rst_i      (rst_i),
     .start_i    (start_i),
     .pc_i       (MUX_PCSrc.data_o),
+    .PCWrite_i	(HazardDetection_Unit.PCWrite_o), 
     .pc_o       (inst_addr)
 );
 
@@ -177,6 +179,7 @@ IFID IFID(
     .start_i (start_i),
     .addr_i (addpc_out),
     .inst_i (Instruction_Memory.instr_o),
+    .IFIDWrite_i (HazardDetection_Unit.IFIDWrite_o)
     .addr_o (IFIDaddr_o),
     .inst_o (inst)
 );
@@ -184,13 +187,13 @@ wire [4:0] IDEX_RTaddr;
 IDEX IDEX(
     .clk_i (clk_i), 
     .start_i (start_i), 
-    .RegWrite_i (Control.RegWrite_o), 
-    .MemtoReg_i (Control.MemtoReg_o),  
-    .MemRead_i (Control.MemRead_o), 
-    .MemWrite_i (Control.MemWrite_o), 
-    .RegDst_i (Control.RegDst_o), 
-    .ALUOp_i (Control.ALUOp_o), 
-    .ALUSrc_i (Control.ALUSrc_o), 
+    .RegWrite_i (MUX8.data_o[7:7]), 
+    .MemtoReg_i (MUX8.data_o[6:6]),  
+    .MemRead_i (MUX8.data_o[5:5]), 
+    .MemWrite_i (MUX8.data_o[4:4]), 
+    .RegDst_i (MUX8.data_o[3:3]), 
+    .ALUOp_i (MUX8.data_o[2:1]), 
+    .ALUSrc_i (MUX8.data_o[0:0]), 
     .addr_i (IFID.addr_o), 
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
@@ -200,7 +203,7 @@ IDEX IDEX(
     .RDaddr_i (inst[15:11]), 
     .RegWrite_o (), 
     .MemtoReg_o (), 
-    .MemRead_o (), 
+    .MemRead_o (MemRead_out), 
     .MemWrite_o (), 
     .RegDst_o (), 
     .ALUOp_o (), 
@@ -218,7 +221,7 @@ EXMEM EXMEM (
     .start_i (start_i),
     .RegWrite_i (IDEX.RegWrite_o),
     .MemtoReg_i (IDEX.MemtoReg_o),
-    .MemRead_i (IDEX.MemRead_o),
+    .MemRead_i (MemRead_out),
     .MemWrite_i (IDEX.MemWrite_o),
     .Adderdata_i (IAdd.data_o),  
     .ALUdata_i (ALU.data_o), 
@@ -259,14 +262,22 @@ Forwarding_Unit Forwarding_Unit (
     .ForwardB_o ()  //MUX_ALURtSrc select
 );
 MUX8 MUX8(
-    .data1_i ({RegDst_o, ALUOp_o, ALUSrc_o, RegWrite_o}), 
+    .data1_i ({
+	    RegWrite_o, 
+	    MemtoReg_o, 
+	    MemRead_o, 
+	    MemWrite_o, 
+	    RegDst_o, 
+	    ALUOp_o, 
+	    ALUSrc_o, 
+	    }), 
     .data2_i (8'd0), 
     .select_i (HazardDetection_Unit.ControlSrc_o), 
     .data_o ()
 );
 HazardDetection_Unit HazardDetection_Unit(
-    .IDEXMemRead_i (IDEX.MemRead_o), 
-    .IDEXRt_i (IDEX.RTdata_o),
+    .IDEXMemRead_i (MemRead_out), 
+    .IDEXRt_i (IDEX_RTdata),
     .IFIDRs_i (IFID.RSdata_o), 
     .IFIDRt_i (IFID.RTdata_o), 
     .PCWrite_o (), 
