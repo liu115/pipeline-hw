@@ -86,7 +86,7 @@ MUX32 MUX_PCSrc(
 MUX32 MUX_RegSrc(
     .data1_i (MEMWB.ALUdata_o),
     .data2_i (MEMWB.ReadData_o),
-    .select_i (MEMWB.MemtoReg),
+    .select_i (MEMWB.MemtoReg_o),
     .data_o ()
 );
 
@@ -197,18 +197,18 @@ EXMEM EXMEM (
     .MemWdata_o ()
 );
 MEMWB MEMWB(
-	clk_i (clk_i),
-	start_i (start_i),
-	RegWrite_i (EXMEM.RegWrite_o),
-	MemtoReg_i (EXMEM.MemtoReg_o),
-	ReadData_i (Data_Memory.data_o),
-	ALUdata_i (ALUresult),
-    RegWaddr_i (EXMEM.RegWaddr_i),
-	RegWrite_o (),
-	MemtoReg_o (),
-	ReadData_o (),
-	ALUdata_o (),
-	RegWaddr_o ()
+	.clk_i (clk_i),
+	.start_i (start_i),
+	.RegWrite_i (EXMEM.RegWrite_o),
+	.MemtoReg_i (EXMEM.MemtoReg_o),
+	.ReadData_i (Data_Memory.data_o),
+	.ALUdata_i (ALUresult),
+    .RegWaddr_i (EXMEM.RegWaddr_i),
+	.RegWrite_o (),
+	.MemtoReg_o (),
+	.ReadData_o (),
+	.ALUdata_o (),
+	.RegWaddr_o ()
 );
 
 endmodule
