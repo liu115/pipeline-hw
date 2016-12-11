@@ -70,14 +70,14 @@ reg RegWrite_o, //  output
     MemRead_o, 
     MemWrite_o, 
     RegDst_o, 
-    ALUSrc_o, 
-    ALUOp_o, // output 2
-    RSaddr_o, //output 5
-    RTaddr_o, 
-    addr_o, //output 32
-    Sign_Extend_o, 
-    RSdata_o, 
-    RTdata_o;
+    ALUSrc_o; 
+reg [1:0] ALUOp_o; // output 2
+reg [4:0] RSaddr_o, //output 5
+	  RTaddr_o; 
+reg [31:0]  addr_o, //output 32
+	    Sign_Extend_o, 
+	    RSdata_o, 
+	    RTdata_o;
 
 
 always @ ( posedge clk_i or negedge start_i) begin
