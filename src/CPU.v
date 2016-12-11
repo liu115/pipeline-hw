@@ -115,7 +115,7 @@ Sign_Extend Sign_Extend(
 
 
 ALU ALU(
-    .data1_i    (Registers.RSdata_o),
+    .data1_i    (IDEX.RSdata_o),
     .data2_i    (MUX_ALUSrc.data_o),
     .ALUCtrl_i  (ALU_Control.ALUCtrl_o),
     .data_o     (),
@@ -203,7 +203,7 @@ MEMWB MEMWB(
 	.MemtoReg_i (EXMEM.MemtoReg_o),
 	.ReadData_i (Data_Memory.data_o),
 	.ALUdata_i (ALUresult),
-    .RegWaddr_i (EXMEM.RegWaddr_i),
+    .RegWaddr_i (EXMEM.RegWaddr_o),
 	.RegWrite_o (),
 	.MemtoReg_o (),
 	.ReadData_o (),
