@@ -90,8 +90,8 @@ MUX32 MUX_RegSrc(
 );
 
 MUX5 MUX_RegDst(
-    .data1_i    (inst[20:16]),  //TODO: change to take from IDEX
-    .data2_i    (inst[15:11]),  //TODO
+    .data1_i    (IDEX.data1_o), 
+    .data2_i    (IDEX.data2_o), 
     .select_i   (IDEX.RegDst_o),
     .data_o     ()
 );
