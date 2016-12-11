@@ -175,13 +175,14 @@ ALU_Control ALU_Control(
 );
 
 IFID IFID(
-    .clk_i (clk_i),
-    .start_i (start_i),
-    .addr_i (addpc_out),
-    .inst_i (Instruction_Memory.instr_o),
+    .clk_i 	(clk_i),
+    .start_i 	(start_i),
+    .addr_i 	(addpc_out),
+    .inst_i 	(Instruction_Memory.instr_o),
+    .Flush_i	(branch | jump),
     .IFIDWrite_i (HazardDetection_Unit.IFIDWrite_o)
-    .addr_o (IFIDaddr_o),
-    .inst_o (inst)
+    .addr_o	(IFIDaddr_o),
+    .inst_o	(inst)
 );
 wire [4:0] IDEX_RTaddr;
 IDEX IDEX(
@@ -194,7 +195,7 @@ IDEX IDEX(
     .RegDst_i (MUX8.data_o[3:3]), 
     .ALUOp_i (MUX8.data_o[2:1]), 
     .ALUSrc_i (MUX8.data_o[0:0]), 
-    .addr_i (IFID.addr_o), 
+    .addr_i (IFIDaddr_o), 
     .RSdata_i (Registers.RSdata_o), 
     .RTdata_i (Registers.RTdata_o), 
     .Sign_Extend_i (Sign_Extend.data_o), 
