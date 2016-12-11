@@ -226,7 +226,7 @@ MEMWB MEMWB(
 	.RegWaddr_o ()
 );
 MUX8 MUX8(
-    .data1_i (), 
+    .data1_i ({RegDst_o, ALUOp_o, ALUSrc_o, RegWrite_o}), 
     .data2_i (8'd0), 
     .select_i (HazardDetection_Unit.ControlSrc_o), 
     .data_o ()
