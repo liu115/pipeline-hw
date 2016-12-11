@@ -45,7 +45,7 @@ PC PC(
     .rst_i      (rst_i),
     .start_i    (start_i),
     .pc_i       (MUX_PCSrc.data_o),
-    .pc_o       ()
+    .pc_o       (inst_addr)
 );
 
 Instruction_Memory Instruction_Memory(
