@@ -8,13 +8,14 @@ module Control
 	MemWrite_o,
 	RegDst_o,
 	ALUOp_o,
-	ALUSrc_o
+	ALUSrc_o,
+	Jump_o
 );
 
 input [5:0] Op_i;
-output RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, RegDst_o, ALUSrc_o;
+output RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, RegDst_o, ALUSrc_o, Jump_o;
 output [1:0] ALUOp_o;
-reg RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, RegDst_o, ALUSrc_o;
+reg RegWrite_o, MemtoReg_o, Branch_o, MemRead_o, MemWrite_o, RegDst_o, ALUSrc_o, Jump_o;
 reg [1:0] ALUOp_o;
 
 always@(Op_i)begin
@@ -28,6 +29,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b1;
 		ALUOp_o <= 2'b11;
 		ALUSrc_o <= 1'b0;
+		Jump_o <= 1'b0;
 	end
 
 	6'b001000: begin // addi
@@ -39,6 +41,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b0;
 		ALUOp_o <= 2'b00;
 		ALUSrc_o <= 1'b1;
+		Jump_o <= 1'b0;
 	end
 
 	6'b100011: begin // lw
@@ -50,6 +53,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b0;
 		ALUOp_o <= 2'b00;
 		ALUSrc_o <= 1'b1;
+		Jump_o <= 1'b0;
 	end
 
 	6'b101011: begin // sw
@@ -61,6 +65,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b0;
 		ALUOp_o <= 2'b00;
 		ALUSrc_o <= 1'b1;
+		Jump_o <= 1'b0;
 	end
 
 	6'b000100: begin // beq
@@ -72,6 +77,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b0;
 		ALUOp_o <= 2'b01;
 		ALUSrc_o <= 1'b0;
+		Jump_o <= 1'b0;
 	end
 
 	6'b000010: begin // jump
@@ -83,6 +89,7 @@ always@(Op_i)begin
 		RegDst_o <= 1'b0;
 		ALUOp_o <= 2'b00;
 		ALUSrc_o <= 1'b0;
+		Jump_o <= 1'b1;
 	end
 
 	default: $display("Invalid Op signal");
