@@ -2,7 +2,14 @@ module CPU
 (
     clk_i,
     rst_i,
-    start_i
+    start_i,
+    // Data Memory interface
+    mem_data_i,
+    mem_ack_i,
+    mem_data_o,
+    mem_addr_o,
+    mem_enable_o,
+    mem_write_o
 );
 
 // Ports
@@ -22,6 +29,41 @@ wire [31:0] signedextend_out;
 wire [31:0] IFIDaddr_o;
 wire [31:0] IOperand; // Output of SignExtend from IDEX (inst[15:0])
 wire MemRead_out;
+
+//
+// to Data Memory interface
+//
+input	[256-1:0]	mem_data_i;
+input				mem_ack_i;
+output	[256-1:0]	mem_data_o;
+output	[32-1:0]	mem_addr_o;
+output				mem_enable_o;
+output				mem_write_o;
+
+//data cache
+dcache_top dcache
+(
+    // System clock, reset and stall
+	.clk_i(clk_i),
+	.rst_i(rst_i),
+
+	// to Data Memory interface
+	.mem_data_i(mem_data_i),
+	.mem_ack_i(mem_ack_i),
+	.mem_data_o(mem_data_o),
+	.mem_addr_o(mem_addr_o),
+	.mem_enable_o(mem_enable_o),
+	.mem_write_o(mem_write_o),
+
+	// to CPU interface
+	.p1_data_i(),
+	.p1_addr_i(),
+	.p1_MemRead_i(),
+	.p1_MemWrite_i(),
+	.p1_data_o(),
+	.p1_stall_o()
+);
+
 Control Control(
     .Op_i       (inst[31:26]),
     .RegWrite_o	(),
@@ -44,7 +86,7 @@ Adder Add_PC(
 );
 
 Adder IAdd (
-    .data1_in (IFIDaddr_o), 
+    .data1_in (IFIDaddr_o),
     .data2_in (signedextend_out << 2),
     .data_o ()
 );
@@ -54,7 +96,7 @@ PC PC(
     .rst_i      (rst_i),
     .start_i    (start_i),
     .pc_i       (MUX_PCSrc.data_o),
-    .PCWrite_i	(HazardDetection_Unit.PCWrite_o), 
+    .PCWrite_i	(HazardDetection_Unit.PCWrite_o),
     .pc_o       (inst_addr)
 );
 
@@ -91,11 +133,11 @@ Data_Memory Data_Memory(
 
 // 0: PC = PC+4, 1: EXMEM Add result
 wire [31:0] branch_pc;
-assign branch_pc = {4'b0, inst[25:0] << 2}; 
+assign branch_pc = {4'b0, inst[25:0] << 2};
 MUX32 MUX_PCSrc(
     .data1_i (MUX_Adderdata.data_o),
     .data2_i (branch_pc),    //EXMEM add result
-    .select_i (jump),  
+    .select_i (jump),
     .data_o ()
 );
 
@@ -115,8 +157,8 @@ MUX32 MUX_Adderdata(
 );
 
 MUX5 MUX_RegDst(
-    .data1_i    (IDEX_RTaddr), 
-    .data2_i    (IDEX.RDaddr_o), 
+    .data1_i    (IDEX_RTaddr),
+    .data2_i    (IDEX.RDaddr_o),
     .select_i   (IDEX.RegDst_o),
     .data_o     ()
 );
@@ -192,35 +234,35 @@ IFID IFID(
 );
 
 IDEX IDEX(
-    .clk_i (clk_i), 
-    .start_i (start_i), 
-    .RegWrite_i (MUX8.data_o[7:7]), 
-    .MemtoReg_i (MUX8.data_o[6:6]),  
-    .MemRead_i (MUX8.data_o[5:5]), 
-    .MemWrite_i (MUX8.data_o[4:4]), 
-    .RegDst_i (MUX8.data_o[3:3]), 
-    .ALUOp_i (MUX8.data_o[2:1]), 
-    .ALUSrc_i (MUX8.data_o[0:0]), 
-    .addr_i (IFIDaddr_o), 
-    .RSdata_i (Registers.RSdata_o), 
-    .RTdata_i (Registers.RTdata_o), 
-    .Sign_Extend_i (Sign_Extend.data_o), 
+    .clk_i (clk_i),
+    .start_i (start_i),
+    .RegWrite_i (MUX8.data_o[7:7]),
+    .MemtoReg_i (MUX8.data_o[6:6]),
+    .MemRead_i (MUX8.data_o[5:5]),
+    .MemWrite_i (MUX8.data_o[4:4]),
+    .RegDst_i (MUX8.data_o[3:3]),
+    .ALUOp_i (MUX8.data_o[2:1]),
+    .ALUSrc_i (MUX8.data_o[0:0]),
+    .addr_i (IFIDaddr_o),
+    .RSdata_i (Registers.RSdata_o),
+    .RTdata_i (Registers.RTdata_o),
+    .Sign_Extend_i (Sign_Extend.data_o),
     .Sign_Extend_o (IOperand),
     .RSaddr_i (inst[25:21]),
-    .RTaddr_i (inst[20:16]), 
-    .RDaddr_i (inst[15:11]), 
-    .RegWrite_o (), 
-    .MemtoReg_o (), 
-    .MemRead_o (MemRead_out), 
-    .MemWrite_o (), 
-    .RegDst_o (), 
-    .ALUOp_o (), 
-    .ALUSrc_o (), 
-    .addr_o (), 
-    .RSdata_o (), 
+    .RTaddr_i (inst[20:16]),
+    .RDaddr_i (inst[15:11]),
+    .RegWrite_o (),
+    .MemtoReg_o (),
+    .MemRead_o (MemRead_out),
+    .MemWrite_o (),
+    .RegDst_o (),
+    .ALUOp_o (),
+    .ALUSrc_o (),
+    .addr_o (),
+    .RSdata_o (),
     .RTdata_o (),
     .RSaddr_o	(),
-    .RTaddr_o (IDEX_RTaddr), 
+    .RTaddr_o (IDEX_RTaddr),
     .RDaddr_o ()
 );
 EXMEM EXMEM (
@@ -231,7 +273,7 @@ EXMEM EXMEM (
     .MemRead_i (MemRead_out),
     .MemWrite_i (IDEX.MemWrite_o),
     .ALUdata_i (ALU.data_o),
-    .RegWaddr_i (MUX_RegDst.data_o), 
+    .RegWaddr_i (MUX_RegDst.data_o),
     .MemWdata_i (ALURtSrc),
     .RegWrite_o (EXMEMRegWrite_o),
     .MemtoReg_o (),
@@ -270,27 +312,27 @@ Forwarding_Unit Forwarding_Unit (
 
 wire [7:0] MUX8_data1;
 assign MUX8_data1 = {
-	    Control.RegWrite_o, 
-	    Control.MemtoReg_o, 
-	    Control.MemRead_o, 
-	    Control.MemWrite_o, 
-	    Control.RegDst_o, 
-	    Control.ALUOp_o, 
-	    Control.ALUSrc_o 
+	    Control.RegWrite_o,
+	    Control.MemtoReg_o,
+	    Control.MemRead_o,
+	    Control.MemWrite_o,
+	    Control.RegDst_o,
+	    Control.ALUOp_o,
+	    Control.ALUSrc_o
 };
 MUX8 MUX8(
-    .data1_i (MUX8_data1), 
-    .data2_i (8'd0), 
-    .select_i (HazardDetection_Unit.ControlSrc_o), 
+    .data1_i (MUX8_data1),
+    .data2_i (8'd0),
+    .select_i (HazardDetection_Unit.ControlSrc_o),
     .data_o ()
 );
 HazardDetection_Unit HazardDetection_Unit(
-    .IDEXMemRead_i (MemRead_out), 
+    .IDEXMemRead_i (MemRead_out),
     .IDEXRt_i (IDEX_RTaddr),
-    .IFIDRs_i (inst[25:21]), 
-    .IFIDRt_i (inst[20:16]), 
-    .PCWrite_o (), 
-    .IFIDWrite_o (), 
+    .IFIDRs_i (inst[25:21]),
+    .IFIDRt_i (inst[20:16]),
+    .PCWrite_o (),
+    .IFIDWrite_o (),
     .ControlSrc_o ()
 );
 
