@@ -70,11 +70,11 @@ initial begin
 	end
 
 	// Load instructions into instruction memory
-	$readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+	$readmemb("cache-test/instruction.txt", CPU.Instruction_Memory.memory);
 
 	// Open output file
-	outfile = $fopen("output.txt") | 1;
-	outfile2 = $fopen("cache.txt") | 1;
+	outfile = $fopen("cache-test/myoutput.txt") | 1;
+	outfile2 = $fopen("cache-test/mycache.txt") | 1;
 
 
 	// Set Input n into data memory at 0x00

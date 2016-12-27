@@ -125,23 +125,35 @@ assign r_hit_data = (hit) ? sram_cache_data : 256'b0; // TODO: return ? when mis
 // read data :  256-bit to 32-bit
 always@(p1_offset or r_hit_data) begin
 	//!!! add you code here! (p1_data=...?)
-  p1_data <= r_hit_data[p1_offset+31:p1_offset];
+  //p1_data <= r_hit_data[p1_offset+31:p1_offset];
+  case ( p1_offset )
+    5'd0: p1_data <= r_hit_data[31:0];
+    5'd4: p1_data <= r_hit_data[63:32];
+    5'd8: p1_data <= r_hit_data[95:64];
+    5'd12: p1_data <= r_hit_data[127:96];
+    5'd16: p1_data <= r_hit_data[159:128];
+    5'd20: p1_data <= r_hit_data[191:160];
+    5'd24: p1_data <= r_hit_data[223:192];
+    5'd28: p1_data <= r_hit_data[255:224];
+    default: p1_data <= r_hit_data[255:224];
+  endcase
 end
 
 
 // write data :  32-bit to 256-bit
 always@(p1_offset or r_hit_data or p1_data_i) begin
 	//!!! add you code here! (w_hit_data=...?)
-  if (p1_offset == 0) begin
-    w_hit_data <= {r_hit_data[255:32], p1_data_i};
-  end
-  else if (p1_offset == 5'd31) begin
-    w_hit_data <= {p1_data_i, r_hit_data[255-32:0]};
-  end
-  else begin
-  // may be wrong ?
-    w_hit_data <= {r_hit_data[255:(p1_offset+4)*8], p1_data_i, r_hit_data[p1_offset*8 - 1:0]};
-  end
+  case ( p1_offset )
+    5'd0: w_hit_data <= {r_hit_data[255:32], p1_data_i};
+    5'd4: w_hit_data <= {r_hit_data[255:64], p1_data_i, r_hit_data[31:0]};
+    5'd8: w_hit_data <= {r_hit_data[255:96], p1_data_i, r_hit_data[63:0]};
+    5'd12: w_hit_data <= {r_hit_data[255:128], p1_data_i, r_hit_data[95:0]};
+    5'd16: w_hit_data <= {r_hit_data[255:160], p1_data_i, r_hit_data[127:0]};
+    5'd20: w_hit_data <= {r_hit_data[255:192], p1_data_i, r_hit_data[159:0]};
+    5'd24: w_hit_data <= {r_hit_data[255:224], p1_data_i, r_hit_data[191:0]};
+    5'd28: w_hit_data <= {p1_data_i, r_hit_data[223:0]};
+    default: w_hit_data <= {p1_data_i, r_hit_data[223:0]};
+  endcase
 end
 
 
@@ -169,6 +181,7 @@ always@(posedge clk_i or negedge rst_i) begin
 	        //!!! add you code here!
           write_back <= 1'b1;
           mem_write <= 1'b1;
+          mem_enable <= 1'b1;
 					state <= STATE_WRITEBACK;
 				end
 				else begin					//write allocate: write miss = read miss + write hit; read miss = read miss + read hit
@@ -196,7 +209,7 @@ always@(posedge clk_i or negedge rst_i) begin
 			STATE_WRITEBACK: begin
 				if(mem_ack_i) begin			//wait for data memory acknowledge
 	        //!!! add you code here!
-          mem_read <= 1'b1;
+          //mem_enable <= 1'b1;
           mem_write <= 1'b0;
           write_back <= 1'b0;
 					state <= STATE_READMISS;

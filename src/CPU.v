@@ -40,10 +40,11 @@ output	[32-1:0]	mem_addr_o;
 output				mem_enable_o;
 output				mem_write_o;
 
+wire mem_stall;
 //data cache
 dcache_top dcache
 (
-    // System clock, reset and stall
+  // System clock, reset and stall
 	.clk_i(clk_i),
 	.rst_i(rst_i),
 
@@ -56,12 +57,12 @@ dcache_top dcache
 	.mem_write_o(mem_write_o),
 
 	// to CPU interface
-	.p1_data_i(),
-	.p1_addr_i(),
-	.p1_MemRead_i(),
-	.p1_MemWrite_i(),
+	.p1_data_i(EXMEM.MemWdata_o),
+	.p1_addr_i(ALUresult),
+	.p1_MemRead_i(EXMEM.MemRead_o),
+	.p1_MemWrite_i(EXMEM.MemWrite_o),
 	.p1_data_o(),
-	.p1_stall_o()
+	.p1_stall_o(mem_stall)
 );
 
 Control Control(
@@ -91,12 +92,14 @@ Adder IAdd (
     .data_o ()
 );
 
+// wire PCEnalbe;
+// assign PCEnable = ;
 PC PC(
     .clk_i      (clk_i),
     .rst_i      (rst_i),
     .start_i    (start_i),
     .pc_i       (MUX_PCSrc.data_o),
-    .PCWrite_i	(HazardDetection_Unit.PCWrite_o),
+    .PCWrite_i	(HazardDetection_Unit.PCWrite_o | mem_stall),
     .pc_o       (inst_addr)
 );
 
@@ -123,13 +126,13 @@ Registers Registers(
     .RTdata_o   (RegRTdata_o)
 );
 
-Data_Memory Data_Memory(
-    .addr_i (ALUresult),
-    .data_i (EXMEM.MemWdata_o),
-    .MemWrite_i (EXMEM.MemWrite_o),
-    .MemRead_i (EXMEM.MemRead_o),
-    .data_o ()
-);
+// Data_Memory Data_Memory(
+//     .addr_i (ALUresult),
+//     .data_i (EXMEM.MemWdata_o),
+//     .MemWrite_i (EXMEM.MemWrite_o),
+//     .MemRead_i (EXMEM.MemRead_o),
+//     .data_o ()
+// );
 
 // 0: PC = PC+4, 1: EXMEM Add result
 wire [31:0] branch_pc;
@@ -222,13 +225,15 @@ ALU_Control ALU_Control(
     .ALUCtrl_o  ()
 );
 
+wire IFIDEnable;
+assign IFIDEnable = HazardDetection_Unit.IFIDWrite_o | mem_stall;
 IFID IFID(
     .clk_i 	(clk_i),
     .start_i 	(start_i),
     .addr_i 	(addpc_out),
     .inst_i 	(Instruction_Memory.instr_o),
     .Flush_i	(branch | jump),
-    .IFIDWrite_i (HazardDetection_Unit.IFIDWrite_o),
+    .IFIDWrite_i (IFIDEnable),
     .addr_o	(IFIDaddr_o),
     .inst_o	(inst)
 );
@@ -251,6 +256,7 @@ IDEX IDEX(
     .RSaddr_i (inst[25:21]),
     .RTaddr_i (inst[20:16]),
     .RDaddr_i (inst[15:11]),
+    .IDEXEnable_i (mem_stall),
     .RegWrite_o (),
     .MemtoReg_o (),
     .MemRead_o (MemRead_out),
@@ -275,6 +281,7 @@ EXMEM EXMEM (
     .ALUdata_i (ALU.data_o),
     .RegWaddr_i (MUX_RegDst.data_o),
     .MemWdata_i (ALURtSrc),
+    .EXMEMEnable_i (mem_stall),
     .RegWrite_o (EXMEMRegWrite_o),
     .MemtoReg_o (),
     .MemRead_o (),
@@ -289,9 +296,10 @@ MEMWB MEMWB(
 	.start_i (start_i),
 	.RegWrite_i (EXMEMRegWrite_o),
 	.MemtoReg_i (EXMEM.MemtoReg_o),
-	.ReadData_i (Data_Memory.data_o),
+	.ReadData_i (dcache.p1_data_o),
 	.ALUdata_i (ALUresult),
 	.RegWaddr_i (EXMEM_RDaddr),
+  .MEMWBEnable_i (mem_stall),
 	.RegWrite_o (MEMWBRegWrite_o),
 	.MemtoReg_o (),
 	.ReadData_o (),

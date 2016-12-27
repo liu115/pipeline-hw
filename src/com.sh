@@ -21,5 +21,7 @@ AND.v \
 EQ.v \
 Forwarding_Unit.v \
 HazardDetection_Unit.v \
-testbench.v
-
+dcache_top.v \
+dcache_tag_sram.v \
+dcache_data_sram.v \
+TestBench-cache.v
